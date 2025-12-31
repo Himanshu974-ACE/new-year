@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Letter for You</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Great+Vibes&family=Playfair+Display:italic,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #fdf2f8;
+            --envelope-color: #fb7185;
+            --envelope-dark: #e11d48;
+            --paper-color: #fffaf0;
+            --text-color: #5c2d3a;
+            --accent-gold: #d4af37;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #fff1f2 0%, #fce7f3 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 0;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Ambient Romantic Elements */
+        .ambient-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .heart, .petal {
+            position: absolute;
+            animation: fall 10s infinite linear;
+            opacity: 0.6;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(110vh) translateX(100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Envelope Wrapper */
+        .envelope-wrapper {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            background-color: var(--envelope-dark);
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 30px 60px rgba(225, 29, 72, 0.2);
+        }
+
+        .envelope-wrapper:hover {
+            transform: scale(1.05) translateY(-10px);
+        }
+
+        .envelope-wrapper.open {
+            cursor: default;
+            transform: scale(1);
+        }
+
+        /* Flap */
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-top: 110px solid var(--envelope-color);
+            transform-origin: top;
+            transition: transform 0.7s 0.3s ease-in-out, z-index 0.3s 0.6s;
+            z-index: 4;
+        }
+
+        .open .flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        /* Wax Seal Style */
+        .heart-seal {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #e11d48, #9f1239);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 0 10px rgba(0,0,0,0.2);
+            transition: opacity 0.4s, transform 0.4s;
+            border: 2px solid #be123c;
+        }
+        
+        .open .heart-seal {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.5);
+        }
+
+        /* Envelope Front Pockets */
+        .envelope-front {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-bottom: 110px solid #fda4af;
+            bottom: 0;
+            z-index: 3;
+        }
+
+        .envelope-sides {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 110px solid transparent;
+            border-bottom: 110px solid transparent;
+            border-left: 160px solid var(--envelope-color);
+            top: 0;
+            left: 0;
+            z-index: 2;
+        }
+
+        .envelope-sides-right {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 110px solid transparent;
+            border-bottom: 110px solid transparent;
+            border-right: 160px solid var(--envelope-color);
+            top: 0;
+            right: 0;
+            z-index: 2;
+        }
+
+        /* The Letter */
+        .letter {
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            width: 300px;
+            height: 200px;
+            background: var(--paper-color);
+            padding: 20px;
+            box-sizing: border-box;
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Start hidden for animation */
+            border: 1px solid #eee;
+        }
+
+        /* Styled Scrollbar for the Letter */
+        .open .letter {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--envelope-color) transparent;
+        }
+
+        .letter::-webkit-scrollbar {
+            width: 6px;
+        }
+        .letter::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .letter::-webkit-scrollbar-thumb {
+            background-color: var(--envelope-color);
+            border-radius: 10px;
+            border: 2px solid var(--paper-color);
+        }
+
+        /* Letter Decorative Border */
+        .letter::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px solid #f9a8d4;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1s 1s;
+            z-index: 5; /* Keep border above text if needed, or relative positioning */
+        }
+
+        /* Fixed border that doesn't scroll */
+        .letter-border {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            z-index: 5;
+        }
+
+        /* Centered and Resized Open State */
+        .open .letter {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 600px;
+            width: 650px;
+            z-index: 100;
+            overflow-y: auto;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.2), 0 0 0 100vw rgba(253, 242, 248, 0.8);
+            padding: 60px;
+            background-image: 
+                radial-gradient(circle at top left, transparent 10%, rgba(251, 113, 133, 0.05) 100%),
+                url('https://www.transparenttextures.com/patterns/natural-paper.png');
+        }
+
+        @media (min-width: 640px) {
+            .open .letter {
+                width: 800px;
+                height: 600px; /* Adjusted height slightly for better scroll focus */
+            }
+        }
+
+        .text-content {
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.6rem;
+            line-height: 1.4;
+            color: var(--text-color);
+            white-space: pre-wrap;
+            opacity: 0;
+            transition: opacity 0.8s 1.5s;
+            text-shadow: 0 0 10px rgba(225, 29, 72, 0.1);
+            padding-bottom: 20px; /* Space at the end of the message */
+        }
+
+        .open .text-content {
+            opacity: 1;
+        }
+
+        /* Bloom effect for typing text */
+        .typing-effect {
+            animation: bloom 1s ease-out forwards;
+        }
+
+        @keyframes bloom {
+            from { text-shadow: 0 0 20px var(--envelope-color); opacity: 0.5; }
+            to { text-shadow: 0 0 0px transparent; opacity: 1; }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em;
+            background-color: var(--envelope-color);
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        #restart-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 25px;
+            background: var(--envelope-color);
+            color: white;
+            border-radius: 50px;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            cursor: pointer;
+            display: none;
+            border: none;
+            box-shadow: 0 10px 20px rgba(251, 113, 133, 0.3);
+            z-index: 110;
+            transition: all 0.3s;
+        }
+
+        #restart-btn:hover {
+            background: var(--envelope-dark);
+            transform: scale(1.05);
+        }
+
+        .instruction {
+            position: absolute;
+            top: -70px;
+            width: 100%;
+            text-align: center;
+            color: var(--envelope-dark);
+            font-family: 'Great Vibes', cursive;
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        #next-btn {
+    display: none;
+    margin-top: 40px;
+    padding: 14px 30px;
+    background: var(--envelope-color);
+    color: white;
+    border-radius: 50px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 10px 20px rgba(251, 113, 133, 0.3);
+    transition: all 0.3s;
+}
+
+#next-btn:hover {
+    background: var(--envelope-dark);
+    transform: scale(1.05);
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="ambient-container" id="ambient-bg"></div>
+
+    <div class="envelope-wrapper" id="envelope" onclick="openLetter()">
+        <div class="instruction" id="instruction">Open with Love</div>
+        <div class="flap"></div>
+        <div class="heart-seal">❤️</div>
+        <div class="envelope-front"></div>
+        <div class="envelope-sides"></div>
+        <div class="envelope-sides-right"></div>
+     
+        <div class="letter" id="letter">
+    <div class="text-content" id="typewriter-text"></div>
+
+    <!-- PASTE NEXT SURPRISE BUTTON BELOW THIS LINE -->
+    <button id="next-btn" onclick="goNext()">Next Surprise 💝</button>
+</div>
+
+    </div>
+
+    <button id="restart-btn" onclick="resetLetter()">Write Back</button>
+
+    <script>
+        const message = `Hy My MAM JI,
+
+     This is my last message for you ab ya last bakwas ha meri naya saal pr jayada kuch samajh nhi aa raha kya bolu kyuki aaj pura din bahut,
+    bakwas ke ha mena mujha to ya bhi nhi pta aap ya padhoga ya nhi pr agar aap ya padh raha to bahut accha ha esa ma bhi jayada kuch alag nhi ha, 
+    yaha pr bhi apko manana aaya hu , ek last try mujha nhi fasla ab aap kya decide karoga mera sath chatha ho ya nhi mujha kuch nhi pta,
+    ma bs chatha hu es saal bhi aap mujh pr trust kara meri galtiyo ko sudharo aur sabsa bada mujha kamiyab hota dekho.
+
+     Aaj ma school gya tha sabhi teachers se bhi mila socha tha ke shayad aap bhi miljayoga es liya puri ptm khatam hona tak wahi tha pr aap aaya nhi,
+    sameena mam se puch to unhona bola ke aap school gya ho aaj , sabhi teachers yahi bolti ha ke himanshu ma tunha kamiyab hota dekhna chathi hu ,
+     sab yahi chatha ha aap bhi pr ya kamiyab hona ha ya ????
+
+    Insan kitna paisa kamaya ya samaj ma kitni usi izzat ha sayad yahi baat kamiyabi ko define karta ha , agar ha to ma bhi ya karna chatha hu meri sapna ha ke apni khud,
+    ke company kholu jo globally top pr raha aur uska liya mujha kuch baata sekhni hoongi bahut se problem ko face karna hoga bahut sara conflict honga unha solve karna hoga, 
+    aur es sab ke liya mujha vo insan bana hoga jis pr log trust kar saka employe ko bhrosa dilana hoga ke mujha lakho logo ko convince karna hoga,
+     aur yahii sabsa badi baat ha ke agar ma apko he convince he nhi kar pa raha to ma kesa un sabhi logo ko khud pr yakeen dila sakta hu jo insan mujha sabsa jayada janta ha wahi mujha pr trust karka,
+     fasla nhi le sakti to ma un sabhi anjan logo ko kesa manayunga es hissab  se to ma kamiyab he nhi ho sakta meri pass vo leadership skills he nhi ha,
+     aur ya bs sath nibhana ke baat nhi ha mujha jaruat ha apki future ma aap vo ho jo mujha support karta ho jo mujha janta ho.
+    
+        
+     Ma bahut apni kismat ko kosta hu haina ke meri kismat esi ha ya ha vo ha pta ha kabhi kabhi dimag faltu ke khayal aana lagta ha kuch bhi sochta ha
+     ma bhi esa he sochna laga tha abhi hostel ma reh kar apsa baat nhi hotii thi chidchida se ho gya ha kuch bhi sahi nhi chal raha tha 11 nov ko ma meri koshish se 
+     apka pass call kiya the ke aaj sab sahi kar dunga vo din mera liya bahut bura tha apki wajah se nhi kyuki usi din he meri behan ke death hui thi mera mood phela he kharab tha aur call
+     pr aap pr bhi chila diya khud ko messenger se bhi block karwa liya phir ma ya sochna laga ke jhand kismat ha meri meri life ma pyaar likha he nhi ha, matlab 
+     insan kuch bhi sochta ha na jab uska dimag kharab ho ab aap life ma wapas aaya too thik hona laga bs yahi ha.
+     
+     Meri sab bakwas ko bhul jao thik ha apko pta ha ma kitna galat hu kitna nhi apsa jayada mujha koe nhi janta to decision apka hatho ma ha agar aap chatha ho ke hum es saal bhi sath raha to esa ho sakta ha 
+    nhi to haar saal kitna ristha khatam hoto ha shayad hamara bhi vasa he ho pr " ma chatha  hu aap mujha chuna apni khushi se aur apni marzi se saccha dil se bina koe jor zabardasti se",
+    agar aap chaho to hum ek rista ma reh sakta ha jesa aap chaho vasa he hoga agar aap bolta ho Himanshu mujha kabhi nazar mat aana ma nhi aayunga kabhi bhi apka samna,
+     kabhi nhi aayunga es baar kyuki ma apko mujha pyaar karna ka liya force nhi kar sakta bs apko bata sakta hu ma apko kitna pyaar karta hu fasla apka hatho ma ha,
+     
+     Aur agar apki haa ha to apko pta ha mujha kaha message karna ha ma apka aaj pura din apka message ka wait karunga aur vo bhi meri main insta id pr es vkcricket wali pr nhi
+     jaha se hamari baat tuti tha wahi pr aur es baar apko vo bolna padega jo ma sunna chatha hu.
+
+     Aur yadi apki fasla esi ulta ha agar aap sochta ho ke esi ma apki khushi ha to ma bhi apki khushi ma khush hu agar apka koe message nhi aaya to ma samajh lunga ke apki na ha
+     aur phir uska baad apko kabhi bhi pareshan nhi karunga kisi bhi tareeka se apka contact ma aana ke koshish nhi karunga.
+
+     Pr meri ek last request bhi ha ek baar milna ke 4 January ko ma ja raha hu wapas ho saka to thodi der ka liya milna aa jana es ka liya bhi ma apko force nhi karunga jo apko theek laga.
+
+     Aur ha advance ma "Happy Anniversary 💖💝" both of us abhi wish kar deta hu shayad baad ma moka na mila(29 januray)
+        
+     ....APKA APNA secret keeper.....   
+     ....... LOVE YOU FOREVER AND EVER.....
+        
+        
+        
+        
+        
+        
+        
+        `;
+
+        const textElement = document.getElementById('typewriter-text');
+        const envelope = document.getElementById('envelope');
+        const instruction = document.getElementById('instruction');
+        const restartBtn = document.getElementById('restart-btn');
+        let isTyping = false;
+
+        function createAmbientEffects() {
+            const container = document.getElementById('ambient-bg');
+            const items = 40;
+            
+            for (let i = 0; i < items; i++) {
+                const element = document.createElement('div');
+                const isHeart = Math.random() > 0.5;
+                
+                element.className = isHeart ? 'heart' : 'petal';
+                element.innerHTML = isHeart ? '❤️' : '🌸';
+                element.style.left = Math.random() * 100 + 'vw';
+                element.style.top = '-10vh';
+                element.style.animationDelay = (Math.random() * 10) + 's';
+                element.style.animationDuration = (Math.random() * 5 + 8) + 's';
+                element.style.fontSize = (Math.random() * 15 + 10) + 'px';
+                element.style.opacity = Math.random() * 0.5 + 0.2;
+                
+                container.appendChild(element);
+            }
+        }
+
+        async function typeWriter(text) {
+            isTyping = true;
+            textElement.innerHTML = '';
+            
+            const cursor = document.createElement('span');
+            cursor.className = 'cursor';
+            
+            const letterDiv = document.getElementById('letter');
+            
+            for (let i = 0; i < text.length; i++) {
+                const charSpan = document.createElement('span');
+                charSpan.textContent = text[i];
+                charSpan.className = 'typing-effect';
+                
+                textElement.appendChild(charSpan);
+                textElement.appendChild(cursor);
+                
+                let speed = 20; // Slightly faster for longer messages
+                if (text[i] === '.' || text[i] === '?' || text[i] === '!') speed = 400;
+                if (text[i] === ',') speed = 200;
+                
+                await new Promise(resolve => setTimeout(resolve, speed));
+                
+                // Auto-scroll to keep the cursor in view while typing
+                letterDiv.scrollTop = letterDiv.scrollHeight;
+            }
+            
+            document.getElementById('next-btn').style.display = 'block';
+            isTyping = false;
+        }
+
+        function openLetter() {
+            if (envelope.classList.contains('open')) return;
+            
+            envelope.classList.add('open');
+            instruction.style.display = 'none';
+            
+            setTimeout(() => {
+                typeWriter(message);
+            }, 2000);
+        }
+
+        function resetLetter() {
+            if (isTyping) return;
+            
+            envelope.classList.remove('open');
+            textElement.innerHTML = '';
+            restartBtn.style.display = 'none';
+            
+            setTimeout(() => {
+                instruction.style.display = 'block';
+            }, 1200);
+        }
+
+        window.onload = createAmbientEffects;
+        function goNext() {
+    window.location.href = "do-you-love-me.html"; // change page name
+}
+
+    </script>
+</body>
+</html>

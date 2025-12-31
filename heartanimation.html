@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Journey & Memories</title>
+    <!-- Elegant Serif Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@200;300&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #0a0104;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        canvas {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 1;
+        }
+
+        #ui-layer, #memory-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .enter-btn {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 182, 193, 0.2);
+            color: #fff;
+            padding: 22px 50px;
+            border-radius: 50px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2rem;
+            font-style: italic;
+            letter-spacing: 3px;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 2s cubic-bezier(0.19, 1, 0.22, 1);
+            pointer-events: auto;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .enter-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .enter-btn:hover {
+            background: rgba(255, 192, 203, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 5px;
+            box-shadow: 0 0 30px rgba(255, 182, 193, 0.3);
+        }
+
+        #memory-layer {
+            background: radial-gradient(circle at center, #2e0d16 0%, #0a0104 100%);
+            opacity: 0;
+            transition: opacity 4s ease-in-out;
+            pointer-events: none;
+            overflow-y: auto;
+            padding: 80px 24px;
+            justify-content: flex-start;
+        }
+
+        #memory-layer.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 60px;
+        }
+
+        .memory-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 182, 193, 0.1);
+            padding: 30px;
+            transition: all 0.7s cubic-bezier(0.165, 0.84, 0.44, 1);
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .memory-card:hover {
+            transform: translateY(-15px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 182, 193, 0.4);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        .memory-img {
+            width: 100%;
+            height: 240px;
+            background: #111;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        /* Softer floral-like gradients for memories */
+        .img-1 { background: linear-gradient(to bottom right, #ff9a9e 0%, #fecfef 100%); opacity: 0.8; }
+        .img-2 { background: linear-gradient(to bottom right, #a18cd1 0%, #fbc2eb 100%); opacity: 0.8; }
+        .img-3 { background: linear-gradient(to bottom right, #fad0c4 0%, #ffd1ff 100%); opacity: 0.8; }
+        .img-4 { background: linear-gradient(to bottom right, #ffecd2 0%, #fcb69f 100%); opacity: 0.8; }
+
+        .memory-title {
+            color: #fff;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .memory-desc {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            line-height: 1.8;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            color: #fff;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            letter-spacing: 10px;
+            font-weight: 200;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        #flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 30%, rgba(15, 2, 8, 0.8) 100%);
+            pointer-events: none;
+            z-index: 5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="vignette"></div>
+    <canvas id="heart"></canvas>
+    
+    <div id="ui-layer">
+        <button id="enterBtn" class="enter-btn">Step Into Himanshu's Heart</button>
+    </div>
+
+    <div id="memory-layer">
+        <h1 class="section-title">Eternal Memories</h1>
+        <p style="color: #ffb6c1; letter-spacing: 4px; font-size: 0.8rem; text-transform: uppercase;">A Tapestry of Grace</p>
+        
+        <div class="memory-grid">
+            <div class="memory-card">
+                <div class="memory-img img-1"></div>
+                <div class="memory-title">Sweetest Serenity</div>
+                <div class="memory-desc">A moment defined by quiet whispers and the gentle unfolding of a new chapter in our story.</div>
+            </div>
+            <div class="memory-card">
+                <div class="memory-img img-2"></div>
+                <div class="memory-title">Starlit Dreams</div>
+                <div class="memory-desc">Wandering beneath the velvet sky, sharing secrets that only the night could hold for us.</div>
+            </div>
+            <div class="memory-card">
+                <div class="memory-img img-3"></div>
+                <div class="memory-title">Golden Elegance</div>
+                <div class="memory-desc">Life in full bloom, where every second felt painted in the warm, soft hues of happiness.</div>
+            </div>
+            <div class="memory-card">
+                <div class="memory-img img-4"></div>
+                <div class="memory-title">Everlasting Bloom</div>
+                <div class="memory-desc">Strong yet delicate, our path remains beautifully woven into the fabric of time.</div>
+            </div>
+        </div>
+
+        <a href="#" style="margin-top: 80px; color: rgba(255,255,255,0.3); text-decoration: none; font-size: 0.7rem; letter-spacing: 3px; border-bottom: 1px solid transparent; font-family: 'Montserrat'; text-transform: uppercase;" onmouseover="this.style.color='#ffb6c1'" onmouseout="this.style.color='rgba(255,255,255,0.3)'" onclick="location.reload()">Begin Anew</a>
+    </div>
+
+    <div id="flash"></div>
+
+<script>
+/**
+ * CINEMATIC HEART JOURNEY: ELEGANT BLOOM EDITION
+ */
+const DIVE_LIMIT = 950; 
+
+window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame;
+
+const isDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
+
+let isTransitioning = false;
+let journeyFinished = false;
+let transitionScale = 1.0;
+let transitionRotation = 0;
+let transitionSpeed = 0.0; 
+let transitionAccel = 0.00003; 
+let formationProgress = 0; 
+let mouseX = 0, mouseY = 0;
+let targetX = 0, targetY = 0;
+
+window.addEventListener('mousemove', (e) => {
+    targetX = (e.clientX - window.innerWidth / 2) * 0.03;
+    targetY = (e.clientY - window.innerHeight / 2) * 0.03;
+});
+
+const init = function () {
+    const canvas = document.getElementById('heart');
+    const ctx = canvas.getContext('2d');
+    const enterBtn = document.getElementById('enterBtn');
+    const memoryLayer = document.getElementById('memory-layer');
+    const flash = document.getElementById('flash');
+    
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    const rand = Math.random;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const heartPos = (t) => [
+        Math.pow(Math.sin(t), 3), 
+        -(15 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))
+    ];
+
+    // Increase density of points for a clearer shape
+    const dr = isDevice ? 0.25 : 0.1; 
+    const pointsOrigin = [];
+    for (let i = 0; i < Math.PI * 2; i += dr) {
+        pointsOrigin.push({ p: heartPos(i), s: 230, w: 15 });
+        pointsOrigin.push({ p: heartPos(i), s: 180, w: 11 });
+        pointsOrigin.push({ p: heartPos(i), s: 130, w: 7 });
+    }
+    
+    const heartPointsCount = pointsOrigin.length;
+    const targetPoints = [];
+
+    // Falling Petals System
+    const petals = [];
+    for(let i = 0; i < 35; i++) {
+        petals.push({
+            x: rand() * width, y: rand() * height,
+            s: rand() * 4 + 2,
+            v: rand() * 0.5 + 0.5,
+            a: rand() * Math.PI,
+            as: rand() * 0.02,
+            color: `rgba(255, ${180 + rand()*50}, ${190 + rand()*40}, ${0.2 + rand()*0.3})`
+        });
+    }
+
+    const dust = [];
+    for(let i = 0; i < 120; i++) {
+        dust.push({ x: rand()*width, y: rand()*height, z: rand()*1000, sz: rand()*1.5 });
+    }
+
+    const updateTargets = (pulseAmt) => {
+        const assembly = Math.min(1, formationProgress * 1.0); 
+        const fScale = transitionScale * assembly;
+        const angle = transitionRotation;
+        const cosA = Math.cos(angle);
+        const sinA = Math.sin(angle);
+
+        mouseX += (targetX - mouseX) * 0.04;
+        mouseY += (targetY - mouseY) * 0.04;
+
+        for (let i = 0; i < heartPointsCount; i++) {
+            const pt = pointsOrigin[i];
+            const pulse = 1 + (pulseAmt * 0.1); 
+            const sX = pt.s * fScale * pulse;
+            const sY = pt.w * fScale * pulse;
+            
+            let x = pt.p[0] * sX;
+            let y = pt.p[1] * sY;
+            
+            const nx = x * cosA - y * sinA;
+            const ny = x * sinA + y * cosA;
+
+            targetPoints[i] = [
+                nx + width / 2 + mouseX,
+                ny + height / 2 + mouseY
+            ];
+        }
+    };
+
+    const particles = [];
+    const traceLen = isDevice ? 15 : 40;
+
+    for (let i = 0; i < heartPointsCount; i++) {
+        const a = rand() * Math.PI * 2;
+        const d = Math.max(width, height) * (1.1 + rand() * 0.4);
+        const sx = width/2 + Math.cos(a) * d;
+        const sy = height/2 + Math.sin(a) * d;
+
+        // More delicate color palette: Rose gold, soft pink, lavender
+        const baseHue = rand() > 0.5 ? 350 : 330;
+        const hue = baseHue + rand() * 20; 
+
+        particles[i] = {
+            vx: 0, vy: 0,
+            speed: rand() * 1.2 + 2.2,
+            q: ~~(rand() * heartPointsCount),
+            D: (i % 2 === 0) ? 1 : -1,
+            force: 0.85 + rand() * 0.1,
+            f: `hsla(${hue}, 85%, ${60 + rand()*20}%, 0.55)`, // Increased opacity
+            sparkle: rand() > 0.7,
+            trace: Array.from({length: traceLen}, () => ({x: sx, y: sy}))
+        };
+    }
+
+    let time = 0;
+    
+    const loop = () => {
+        if (journeyFinished) return;
+
+        if (formationProgress < 1) formationProgress += 0.0009;
+        else if (!enterBtn.classList.contains('visible') && !isTransitioning) {
+        setTimeout(() => enterBtn.classList.add('visible'), 1200);
+    }
+
+        const t = time % (Math.PI * 2);
+        // Softer, breathing-style heartbeat
+        const heartCycle = Math.pow(Math.sin(t), 8) * 1.0 + Math.pow(Math.sin(t + 0.4), 14) * 0.5;
+        const pulseAmt = formationProgress >= 1 ? heartCycle : 0;
+        
+        updateTargets(pulseAmt);
+        time += 0.015;
+        
+        // Slightly darker background clear to make threads pop
+        const clearAlpha = isTransitioning ? Math.max(0.01, 0.15 / (1 + transitionSpeed * 10)) : 0.15;
+        ctx.fillStyle = `rgba(10, 1, 4, ${clearAlpha})`;
+        ctx.fillRect(0, 0, width, height);
+
+        // Dust and Stars
+        ctx.globalCompositeOperation = 'lighter';
+        dust.forEach(d => {
+            if (isTransitioning) d.z -= transitionSpeed * 200;
+            if (d.z < 1) d.z = 1000;
+            const sc = 500 / d.z;
+            const dx = (d.x - width/2) * sc + width/2;
+            const dy = (d.y - height/2) * sc + height/2;
+            ctx.fillStyle = `rgba(255, 182, 193, ${0.1 * sc/2})`;
+            ctx.fillRect(dx, dy, d.sz*sc*0.1, d.sz*sc*0.1);
+        });
+
+        // Petal Drift
+        petals.forEach(p => {
+            p.y += p.v + (pulseAmt * 0.5);
+            p.x += Math.sin(p.a) * 0.5;
+            p.a += p.as;
+            if (p.y > height + 20) { p.y = -20; p.x = rand() * width; }
+            ctx.fillStyle = p.color;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.a);
+            // Draw a simple petal shape
+            ctx.beginPath();
+            ctx.ellipse(0, 0, p.s, p.s*0.6, 0, 0, Math.PI*2);
+            ctx.fill();
+            ctx.restore();
+        });
+        ctx.globalCompositeOperation = 'source-over';
+
+        if (isTransitioning) {
+            transitionAccel += transitionScale < 60 ? 0.00004 : 0.0008;
+            transitionSpeed += transitionAccel;
+            transitionScale *= (1.0 + transitionSpeed);
+            transitionRotation += transitionSpeed * 0.04;
+
+           if (transitionScale > DIVE_LIMIT) {
+            flash.style.opacity = "1";
+            flash.style.transition = "opacity 2.5s ease-in";
+
+             setTimeout(() => {
+           // smooth cinematic redirect AFTER animation
+           window.location.href = "memorylane.html";
+           }, 2500);
+}
+
+        }
+
+        // Render Threads with Glow
+        for (let i = particles.length; i--;) {
+            const p = particles[i];
+            const q = targetPoints[p.q];
+            if(!q) continue;
+            
+            const dx = p.trace[0].x - q[0];
+            const dy = p.trace[0].y - q[1];
+            const len = Math.sqrt(dx * dx + dy * dy) || 1;
+            
+            if (len < 10) {
+                p.q = (rand() > 0.97) ? ~~(rand() * heartPointsCount) : (p.q + p.D + heartPointsCount) % heartPointsCount;
+            }
+
+            let spd = p.speed;
+            if (formationProgress < 1) spd *= 1.3;
+            if (isTransitioning) spd *= (1 + transitionSpeed * 15);
+
+            p.vx += -dx / len * spd;
+            p.vy += -dy / len * spd;
+            p.trace[0].x += p.vx;
+            p.trace[0].y += p.vy;
+            p.vx *= p.force;
+            p.vy *= p.force;
+
+            for (let k = 0; k < p.trace.length - 1; k++) {
+                const T = p.trace[k];
+                const N = p.trace[k+1];
+                const kF = isTransitioning ? Math.max(0.02, 0.35 / (1 + transitionSpeed * 25)) : 0.38;
+                N.x -= kF * (N.x - T.x);
+                N.y -= kF * (N.y - T.y);
+            }
+
+            // Glow Pass - made brighter and wider
+            ctx.beginPath();
+            ctx.strokeStyle = p.f.replace('0.55)', '0.15)');
+            ctx.lineWidth = isTransitioning ? Math.min(14, 4 + transitionSpeed * 35) : 5;
+            ctx.moveTo(p.trace[0].x, p.trace[0].y);
+            for (let k = 1; k < p.trace.length; k++) ctx.lineTo(p.trace[k].x, p.trace[k].y);
+            ctx.stroke();
+
+            // Silk/Thread Pass - made brighter and thicker
+            ctx.beginPath();
+            ctx.strokeStyle = p.f.replace('0.55)', '0.85)');
+            ctx.lineWidth = 1.5;
+            ctx.moveTo(p.trace[0].x, p.trace[0].y);
+            for (let k = 1; k < p.trace.length; k++) ctx.lineTo(p.trace[k].x, p.trace[k].y);
+            ctx.stroke();
+
+            // Glitter Sparkle at the head
+            if (p.sparkle && formationProgress >= 1) {
+                ctx.fillStyle = `rgba(255, 240, 220, ${isTransitioning ? 0.9 : 0.6})`;
+                ctx.fillRect(p.trace[0].x, p.trace[0].y, 1.8, 1.8);
+            }
+        }
+
+        requestAnimationFrame(loop);
+    };
+
+    enterBtn.addEventListener('click', () => {
+        isTransitioning = true;
+        enterBtn.classList.remove('visible');
+    });
+
+    loop();
+};
+
+window.onload = init;
+</script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Happy New Year 2026 🎆</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React + Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body { background:#020617; margin:0; overflow:hidden; }
+
+    @keyframes sparkGradient {
+      0% { background-position:0% 50%; }
+      50% { background-position:100% 50%; }
+      100% { background-position:0% 50%; }
+    }
+
+    .fire-number{
+      background:linear-gradient(135deg,#ff9f0a,#ff3b30,#ff2d55,#c43aff,#7c3aed);
+      background-size:200% 200%;
+      background-clip:text;
+      -webkit-background-clip:text;
+      color:transparent;
+      animation:sparkGradient 3s infinite;
+    }
+
+    .spark-card{
+      background:rgba(15,23,42,.85);
+      border-radius:1.25rem;
+      box-shadow:0 20px 40px rgba(0,0,0,.35);
+    }
+
+    .floating{
+      position:absolute;
+      font-size:2.2rem;
+      animation:floatUp 12s linear infinite;
+      pointer-events:none;
+    }
+
+    @keyframes floatUp{
+      0%{transform:translateY(100vh);opacity:1}
+      100%{transform:translateY(-10vh);opacity:0}
+    }
+
+    canvas{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+    }
+  </style>
+</head>
+
+<body>
+<div id="root"></div>
+<canvas id="fireworks"></canvas>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const App = () => {
+  const [timeLeft, setTimeLeft] = useState({days:0,hours:0,minutes:0,seconds:0});
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [showNote, setShowNote] = useState(false);
+  const [isNewYear, setIsNewYear] = useState(false);
+  const [musicOn, setMusicOn] = useState(false);
+  const [newYearPassed, setNewYearPassed] = useState(false);
+  const [showHiddenBtn, setShowHiddenBtn] = useState(false);
+
+  const TARGET = new Date("January 1 , 2026 00:00:00").getTime();
+  const surpriseLink = "confessionletter.html";
+
+
+useEffect(() => {
+  if (Date.now() >= TARGET) {
+    setNewYearPassed(true);
+  }
+}, []);
+
+  /* 🎶 MUSIC SETUP */
+  useEffect(() => {
+    if (!window._bgMusic) {
+      window._bgMusic = new Audio(
+        "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+      );
+      window._bgMusic.loop = true;
+      window._bgMusic.volume = 0.7;
+    }
+  }, []);
+
+  const toggleMusic = async () => {
+    try {
+      if (!musicOn) {
+        await window._bgMusic.play();
+        setMusicOn(true);
+      } else {
+        window._bgMusic.pause();
+        setMusicOn(false);
+      }
+    } catch (e) {
+      console.warn("Music error:", e);
+    }
+  };
+
+  /* ⏱ Countdown + New Year logic */
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const d = TARGET - Date.now();
+
+      if (d <= 0 && !isNewYear) {
+        setIsNewYear(true);
+        setShowOverlay(true);
+        setShowNote(true);
+        setShowHiddenBtn(true);
+
+        confetti({ particleCount: 300, spread: 200, origin: { y: 0.6 } });
+
+        setTimeout(() => {
+         localStorage.setItem("newYearUnlocked","true");
+          window.location.href = surpriseLink;
+        }, 30000);
+      }
+
+      if (d > 0) {
+        setTimeLeft({
+          days: Math.floor(d / 86400000),
+          hours: Math.floor(d / 3600000) % 24,
+          minutes: Math.floor(d / 60000) % 60,
+          seconds: Math.floor(d / 1000) % 60,
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isNewYear]);
+
+  /* 🎆 FIREWORKS */
+  useEffect(() => {
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+
+    const resize = () => {
+      canvas.width = innerWidth;
+      canvas.height = innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    let particles = [];
+
+    function firework(x,y){
+      for(let i=0;i<160;i++){
+        const a = Math.random()*Math.PI*2;
+        const s = Math.random()*3+2;
+        particles.push({
+          x,y,
+          vx:Math.cos(a)*s,
+          vy:Math.sin(a)*s,
+          life:100,
+          hue:Math.random()*360
+        });
+      }
+    }
+
+    function animate(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p=>{
+        p.x+=p.vx;
+        p.y+=p.vy;
+        p.vy+=0.02;
+        p.life--;
+        ctx.fillStyle=`hsla(${p.hue},100%,60%,${p.life/100})`;
+        ctx.fillRect(p.x,p.y,2,2);
+      });
+      particles = particles.filter(p=>p.life>0);
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    const fw = setInterval(()=>{
+      firework(Math.random()*canvas.width, Math.random()*canvas.height*0.6);
+    },1400);
+
+    return ()=>clearInterval(fw);
+  }, []);
+
+  const units = [
+    {k:"days",l:"Days"},
+    {k:"hours",l:"Hours"},
+    {k:"minutes",l:"Minutes"},
+    {k:"seconds",l:"Seconds"},
+  ];
+
+  return (
+    <div className="min-h-screen text-white flex flex-col items-center justify-center px-4 relative z-10">
+
+      {showOverlay && (
+        <div className="fixed inset-0 bg-black/90 flex flex-col items-center justify-center z-50 text-center px-6">
+          <h1 className="text-6xl md:text-8xl font-extrabold fire-number">
+            NEW YEAR MAM JI
+          </h1>
+          <p className="mt-6 text-xl text-pink-400 animate-bounce">
+            Wishing you endless joy and celebration! </p>
+
+         
+
+          {showNote && (
+            <div className="mt-10 bg-slate-800/90 p-8 rounded-3xl max-w-xl 
+                max-h-[70vh] overflow-y-auto">
+
+              <p className="italic text-lg">
+                “Mam Ji, may this year bring happiness, success, and countless smiles.”
+
+                 <p>
+            May this year bring you bahut sari khushiya aur badhiya es saal jo aap apni 
+            smile kho chuka ho jo baat baat pr dil nhi lagta apka lagna lag jaya , ya saal apka liay 2025 se bhi jayada accha ho bs yahi meri bhagawn se 
+            dua ha es saal apki har problem dur ho jao mujha chhod kar apko ya samajh ma aa jaya he hum dono ko sath rehna chahiye aur har saal sath ma celebrate karna chahiye
+            you are my princess allah kar es saal apka chehra pr bahut sari smile ho aur mujha meri pheli jesi chulbhul mam wapas mil jaya aur es saal pr apko sabsa phela wish karna wala insan ma hu 
+            ma yahi chatha tha ke apko sabsa phela ma wish karu es liya mena ya Countdown ka system banaya mujha pta ha ab apko kisi baat ke khushi nhi hoti pr es naya saal ke puri dil se aur khush ho kar 
+            welcome karo jo ya apki life ma bhi happiness bhar de esa jayada accha se kesa badhai deta ha mujha nhi aata sur na he ma google se copy paste karna chatha hu 
+            ha us apki wali wish ke tarah nhi ha jesi wishes apna mujha de thi bs pr ma esa he kar sakta hu na ya cheeza mujha samajh ma nhi aati etna romantic nhi hu na ma 
+            aur ya message apki screen pr 30 sec ka liya rahega phir apna aap ke ap dusra page pr chala jayoga
+          </p>
+              </p>
+              <p className="mt-4 text-sm text-purple-300">
+                — From Himanshu 💫
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      <h1 className="text-6xl md:text-7xl font-black text-center">
+        <span className="bg-gradient-to-r from-amber-400 via-pink-500 to-violet-600 bg-clip-text text-transparent">
+          HAPPY NEW YEAR 2026
+        </span>
+      </h1>
+
+      <p className="mt-4 text-slate-300 text-center">
+        A new year. A fresh start. Endless memories ahead.
+      </p>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10 max-w-5xl w-full">
+        {units.map(u=>(
+          <div key={u.k} className="spark-card p-6 text-center">
+            <div className="text-6xl font-extrabold fire-number">
+              {String(timeLeft[u.k]).padStart(2,"0")}
+            </div>
+            <div className="mt-2 tracking-widest text-sm text-purple-200">
+              {u.l}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-8 text-center text-pink-400 italic tracking-widest text-lg">
+        More towards Himanshu’s heart…
+      </p>
+
+      {/* ❤️ ENTER HEART BUTTON */}
+      <div className="mt-10 flex flex-col md:flex-row gap-4">
+        {showHiddenBtn && (
+  <div className="mt-6 text-center">
+    <a
+      href="hiddenmessages.html"
+      className="px-12 py-4 bg-gradient-to-r from-yellow-400 via-pink-500 to-red-600
+                 rounded-full font-extrabold tracking-widest shadow-2xl
+                 hover:scale-110 transition-transform animate-pulse inline-block"
+    >
+      🔐 Hidden Message
+    </a>
+
+    <p className="mt-2 text-sm text-pink-300 italic">
+      Unlocked on New Year’s Midnight ✨
+    </p>
+  </div>
+)}
+
+        <a
+          href="heartanimation.html"
+          className="px-10 py-4 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 
+                     rounded-full font-extrabold tracking-wider shadow-xl 
+                     hover:scale-110 transition-transform inline-block"
+        >
+          Enter His Heart ❤️
+        </a>
+
+        {/* 🎶 PLAY MUSIC BUTTON */}
+        <button
+          onClick={toggleMusic}
+          className="px-10 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 
+                     rounded-full font-bold shadow-xl 
+                     hover:scale-110 transition-transform"
+        >
+          {musicOn ? "Pause Music 🎵" : "Play Music 🎶"}
+        </button>
+      </div>
+
+      {/* Floating Emojis */}
+      {["🎉","🎆","💝","✨","🥳","🌟","🎊","🔥"].map((e,i)=>(
+        <div key={i} className="floating" style={{left:`${8+i*10}%`,animationDelay:`${i*1.2}s`}}>
+          {e}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

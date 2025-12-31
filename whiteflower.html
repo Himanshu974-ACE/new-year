@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>White Flower Bloom</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    body {
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    /* Canvas */
+    canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    /* Center Photo */
+    #photo-container {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.3);
+      transition: all 1.6s ease;
+      z-index: 2;
+      box-shadow: 0 0 60px rgba(255,255,255,0.4);
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+
+    #photo-container.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    #photo-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Glass Note */
+    #note {
+      position: absolute;
+      bottom: 8%;
+      left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      width: 450px;
+      max-width: 92vw;
+      padding: 1.4rem;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.15);
+      text-align: center;
+      color: rgb(209, 69, 113);
+      opacity: 0;
+      transition: all 2s ease;
+      z-index: 10;
+      max-height: 70vh;
+      overflow-y: auto;
+
+    }
+
+    #note.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #note h2 {
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      font-weight: 300;
+      margin-bottom: 8px;
+    }
+
+    #note p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(212, 64, 120, 0.85);
+  max-height: 55vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+#note p::-webkit-scrollbar {
+  width: 6px;
+}
+
+#note p::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 10px;
+}
+
+#note p::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+    
+  </style>
+</head>
+
+<body>
+
+  <!-- Center Photo -->
+  <div id="photo-container">
+    <img src="7.jpeg">
+  </div>
+
+  <!-- Canvas -->
+  <canvas id="c"></canvas>
+
+  <!-- Note -->
+  <div id="note">
+    <h2>Pure White Flower for my Sweeatheart ka liya🥰💝😘</h2>
+    <p>
+      Apko white flower bahut pasand haina es liya mena white flower ke animation banayi ha jayada acchi nhi ban payi pr abhi ka liya esi se kaam chala lo kaam se kaam es saal apko ek flower to de 
+      saku kesa bhi dena pada, pta nhi apko kesa lagega pr filhal yahhi ha sorry <br><br>
+
+      humara puri saal se related baat to ma phela he kar chuka hu haina esma thodi se aur bakwas ha apka liya ba ya sun lo akhri page ha ya aur baki ke bakwass sunnna ka liya apko raat correct 12 bajna se ek min phela ya website dubara kholna 
+      ok ab thoda aur bacha ha raat jo timer chal raha tha na starting ka page pr vo complete hoga to dekhna waha pr bhi mena bahut sahi bakwas kari ha agar man ho to vo sab padhna nhi to agha badhta rehna usma okk ya to rahi aaj raat ke baat aur yaad raha time se phela dubara
+      open karana es website tabhi vo sab dekh payoga <br><br>
+      Samajh nhi aa raha ab kya bolu phela he bahut bol chuka hu apko pta ha ma kyu bana raha hu mujha kya shok ya sab karna ka faltu ma bs apko batana ka liya aap meri liya kya ho apka liya mera dil ma kya ha apko ya batana ke liye ki aap meri number one ho😘,aap meri sab kuch ho bs es liya🥰💝😘
+      mujha pta ha hum dono ke beech ma cheez sahi nhi ha pr time match nhi ho pata pr ma humara ristha pr haar nhi mana chatha aaj bhi nhi aur kabhi bhi nhi mujha nhi pta ma kya naam du hum dono ke ristha ko ya hum dono ka agha kya future hoga ya sab bs es liya apko batana ke liya ke jo bhi mera future ho
+      pr apka bina sab bekar pr agar aap ab bhi yahi sochta ho ke humara kuch nhi ho sakta ma apsa zabardasti nhi kar sakta ab jo apka fasla ha wahi meri fasla ek pr <br>
+      <br>
+      "pr ek last chance de do plz ek akhri baaar😊,<br>
+      aur ager iske baad bhi apko lagta ha humara koe future nhi ha ya apki life me meri koi value nhi ha😶‍🌫️,<br>
+      ma khud apki zindagi se se chala jayunga😔"<br>
+      <br>
+      <br>
+      pr es last chance me ma chathu ke aap apni taraf se pura dil se raha ma chatha hu aap dil se ristha nibhao shayad ma apki zindagi na ban saku pr aap he meri zindagi ho 
+      ek  line ha ki <br><br>
+      "hum jinsa pyaar karta haina unke aage conditions nhi lagata ,<br>
+      unhe jo faisla karna hai apni zindagike liye uske liye poori azadi deni chahiye unko,<br>
+      agar humari jagah unki zindagi me hai , to humara alawa koe nahi le sakta,<br>
+      aur agar hamari jagah unki zindagi me hai hi nhi to unha takleef dena se accha ha insan rasta se khud hatt jaye,"<br><br>
+
+     Dekho mam humara milna kismat ma likha tha aap he socho ma school chhod kar wapas yahi aaya vo bhi ghar walo ke marzi ke khilaf kisi ke nhi suni bs us time chhod diya aur wapas usi school ma aaaya aap bhi usi time es school ma aaya ,
+     aur phir pawan sir ma mujha khusboo mam ke class ma beetha diya phir hum dono aur kareeb aaya hum dono ko ek dusra ka sath accha laga ek dusra se mohabaat hui bahut badi badi ladai bhi hui pr phir bhi hum sath tha aur ab bhi es baar sab khatam hona ka baad bhi 
+     hum dono contact ma ha baat hoti ha hum dono ka dil ma feelings ha ek dusra aur kya pta hum future ma dubara se mila shayad meri wapas jana se phela shayad aap bolo ke ma plan karta hu ya pr etna sab to mera plan nhi ho sakta <br>
+     <br>
+     Koe to cheez ha jo hum dono ko ab bhi sath rakh rahi ha aur sayad future ma bhi huma sath rakha , apko shayad ya sab bakwas laga pr kuch to ha hum dono ke beech jo chatha ha hum dono sath raha 
+     mujha nhi pta agha kya hoga aur na ma ya bolna wala ke agla saal hum dono ke beech koe problem nhi aayegi bilkul aayegi,bahut se ladai bhi hogi cheeza bigidenga bhi bahut kuch hoga apko bahut kuch jhela bhi pad sakta ha pr agar hum sath ho to sab cheez sahi bhi ho sakti ha es saal ke tarah es saal bhi to bahut kuch hua ha end ma aa kar sab theek ha na,
+     to kya pta ke agla saal bhi sab theek ho aur usa agla saal bhi sochna humara upar ha es saal mena bahut se galti ke ha aur shayad agla saal bhi karu pr ma puri koshish karta hu kar raha hu <br>
+     <br>
+
+     dekho mam ma bs apko yakeen dila sakta hu apko mana sakta hu pr future dekhna to meera bas ma nhi to es liya apna liya accha sochta ha aur sath ma ek nayi shurwaat karta ha apka samna ma hu ab aap he fasla karo kya karna ha mujh pr bhrosa karka naya saal bhi aur memoreis banani ha ya mujha chhod kar agha nikal jana ha ab fasla apka hoga <br><br>
+     aur ha ya kabhi mat sochna ke mujha apka nafrat ha aur ma apko baduaa dunga esa kuch nhi ha aap meri liya meri duniya ho aur ma apsa beinteha mohabaat karta pr aur apko yakeen dilana ke liya bs mera pass meri bata ha meri bakwas bs yahi ha jisa apko jakeen dila <br>
+     <br>
+     mujha bura lagta ha jab aap udaas retha ho aur ma apko khush nhi kar pata mujha jokes marna nhi aata ma logo ko mana ma accha nhi hu , ma bahut ziddi hu , kabhi kabhi baccho ke tarah zid karta hu baat karna ke ,arrogant hu , egoistic hu, bahut kamiya ha mujha ma pr esa ya nhi badalta ke ma apsa kitna pyaar karta hu aur es  liya ma apka liya perfect insan bana ka liya tayar hu ,
+     ma chatha hu ke future ma aap kisi ek din bolo ke ya vo insan ha jisna har waqt mera sath diya , na ya mera husband ha aur na he koe family member pr ya vo insan ha  jo mujha himmat deta ha jesa ma bolta hu ma soniya ha to himanshu ha bina soniya ke himanashu kuch nhi 
+     es tarah se ma bhi ya sunna chatha hu ke aap kisi din bolo ke himanashu ha to ma hu bina himanshu ke ma kuch bhi nhi hu
+     bs ya sunna chatha hu ma apka muh se aur ya sunna ke liya ma kuch bhi karunga sacchi <br>
+     <br>
+     aur jo baat ma apsa apni chats pr karta hu na raat raat bhar vo sab ma apka sath karna chatha hu apki har dukh ka sath ma banu bs yahi chatha hu <br>
+     ab meri bakwas to khatam karta ha aaj jo mera dil ma tha bol diya agar meri aur bakwas sunnni ho to raat ko open karna website ko aur ma chatha hu ke aap ek baar raat ko jarur open karo usma ek bahut acchi cheez ha agar apki ha ho to kindoff porpose karunga phela he bata du aur agar apki na ho to bhi dekhna kis tarah se kara raha hu mehnat bahut lagi ha thik ha to jata jata do shayari ho jaya aur agar kuch bura laga ho to sorry apka baccha hu galti karta retha hu maaf karna apka haak ha aur sorry bolna mera 
+     <br>
+     <br>
+     "ke tu chintao ma na apna haal behal rakha kar🤧,<br>
+     ke tu chintao ma na apna haal behal rakha kar 😵,<br>
+     mujh ko bana kar apni dhaal rakha kar🛡️🛡️,<br>
+     aur tu theek nhi rethi to mujha accha nhi lagta es liya ketha hu tu apna dhyan rakha kar💝🥰"<br>
+      <br>
+     "Tumha le kar kabhi mera khayal nhi badlega😵,<br>
+     yu to saal bahut badlenga pr magar mera pyaar nhi  badlega😘😘"<br>
+     <br>
+     sunno ma shayad ek 4-5 ko wapas chala jayunga, jana se phela ek akhri baar milna chatha hu bs thodi der ke liya he sahi pr mila ha mil kar goodbye bolna ha ahar bolna pada to please ya meri akhri request ha apsa apni life ke kimti time me se kuch pal meri liya nikal pr aa jaana 
+     apka favourite secret keeper ko accha lagega <br>
+
+     ...THANK YOU TO MAKE THIS YEAR VERY BEAUTIFUL AND AMAZING ......<br>
+     ..........I WILL ALWAYS LOVE YOU FOREVER AND ENDEVER .............<br>
+
+     Apka himanashu
+
+
+    </p>
+  </div>
+
+  <!-- External math helper -->
+  <script src="https://codepen.io/enxaneta/pen/VLqXYo.js"></script>
+
+  <script>
+    const C = document.getElementById("c");
+    const Ctx = C.getContext("2d");
+    const photo = document.getElementById("photo-container");
+    const note = document.getElementById("note");
+
+    let Cw, Ch;
+
+    const c = document.createElement("canvas");
+    const ctx = c.getContext("2d");
+    const cw = c.width = 400;
+    const ch = c.height = 400;
+    const cx = cw / 2;
+    const cy = ch / 2;
+
+    const rad = Math.PI / 180;
+    let frames = 0;
+    let startTime = Date.now();
+    let revealedPhoto = false;
+    let revealedNote = false;
+    let stopFlower = false;
+
+    const Rx = 150, Ry = 150, kx = 3, ky = 4;
+    const petals = 7;
+
+    ctx.strokeStyle = "#ffffff";
+    ctx.globalAlpha = 0.5;
+    ctx.lineWidth = 0.25;
+
+    function resize() {
+      Cw = C.width = window.innerWidth;
+      Ch = C.height = window.innerHeight;
+      Ctx.setTransform(1,0,0,1,0,0);
+      Ctx.translate(Cw / 2, Ch / 2);
+      Ctx.scale(0.75, 0.75);
+    }
+
+    function draw() {
+      const elapsed = Date.now() - startTime;
+
+      /* Stop flower after 10 seconds */
+      if (elapsed > 20000) {
+        stopFlower = true;
+      }
+
+      if (!stopFlower) {
+        frames += 0.20;
+        Ctx.clearRect(-Cw, -Ch, Cw * 2, Ch * 2);
+
+        const t = frames * rad;
+        const rx = Rx * Math.abs(Math.cos(t)) + 50;
+        const ry = Ry * Math.abs(Math.sin(t)) + 50;
+
+        const x  = cx + rx * Math.sin(kx * t + Math.PI/2);
+        const y  = cy + ry * Math.sin(ky * t + Math.PI/2);
+        const x1 = cx + rx * Math.sin(kx * t + Math.PI);
+        const y1 = cy - ry * Math.sin(ky * t + Math.PI);
+        const x2 = cx + rx * Math.sin(kx * t);
+        const y2 = cy - ry * Math.sin(ky * t);
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.quadraticCurveTo(x1, y1, x2, y2);
+        ctx.stroke();
+        ctx.globalCompositeOperation = "lighter";
+
+        for (let i = 0; i < petals; i++) {
+          Ctx.drawImage(c, -200, -400);
+          Ctx.rotate((Math.PI * 2) / petals);
+        }
+      }
+
+      /* Photo at 6s */
+      if (!revealedPhoto && elapsed > 8000) {
+        revealedPhoto = true;
+        photo.classList.add("show");
+      }
+
+      /* Note at 8s */
+      if (!revealedNote && elapsed > 10000) {
+        revealedNote = true;
+        note.classList.add("show");
+      }
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("load", () => {
+      resize();
+      draw();
+    });
+  </script>
+
+</body>
+</html>
